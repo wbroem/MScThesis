@@ -1,0 +1,25 @@
+Project Goal: Build a ML model to identify SN in gravitational lenses
+
+*** --> Question for Dr. Holwerda in next meeting
+
+Analysis:
+    1. Obtain single pixel, 30min cadence TESS lightcurves
+    2. Analyze these lightcurves to search for possible SN
+    3. Use unsupervised ML technique (k-means clustering?) to identify lenses
+    
+    
+(1.):
+    -use lightkurve python package to obtain lightcurves (see email from Scott Fleming on 10/1)
+    -Confirm with Dr. Holwerda: Is this the data we want? ***
+    -Do we also want the images, or just the lightcurve data? ***
+    -10/11 : lightkurve is failing to find data for any of the confirmed lenses, but is working for some other objects. Need to continue to troubleshoot this
+    -Some of the data in the tutorial looks rough, may have to apply a smoothing function...
+    
+(2.):
+    -Lightcurve folding?
+    
+(3.):
+    -Literature search for other groups that have done similar work!
+        -What method is best (k-means clustering or something else?) ?
+        -Are there other techniques we have not considered?
+    -Look through .ipynb's from PHYS650 for a review on how to implement these techniques
