@@ -6,14 +6,21 @@ Analysis:
     1. Obtain single pixel, 30min cadence TESS lightcurves
     2. Analyze these lightcurves to search for possible SN
     3. Use unsupervised ML technique (k-means clustering?) to identify lenses
+    4. If time permits, perhaps use CM's code for flare simulation to run a supervised ML technique to identify flares in our data
     
     
 (1.):
-    -use lightkurve python package to obtain lightcurves (see email from Scott Fleming on 10/1)
-    -Confirm with Dr. Holwerda: Is this the data we want? ***
-    -Do we also want the images, or just the lightcurve data? ***
-    -10/11 : lightkurve is failing to find data for any of the confirmed lenses, but is working for some other objects. Need to continue to troubleshoot this
-    -Some of the data in the tutorial looks rough, may have to apply a smoothing function...
+    -Example notebook:
+        https://github.com/spacetelescope/notebooks/blob/master/notebooks/MAST/TESS/beginner_tour_lc_tp/beginner_tour_lc_tp.ipynb
+    -Obtain data via TESSCut:
+        https://mast.stsci.edu/tesscut/
+    ***
+    -Which pixel frame do we want to display in our results? See notebook 2. -- integrate over the whole stack
+    -Do we actually want single-pixel images, or maybe a 3x3 so we can see the surrounding events also? -- 5x5
+    -We are using different data than that of the example notebook above... Do we have the data that we wanted? -- yes, but need        30min cadence
+    -Time bins?? See notebook 1. -- links in TESSCut
+    -Do we care about aperture optimization or do we just want to use the whole pixel? (Example notebook adjusts aperture for LC)      --nope
+    ***
     
 (2.):
     -Lightcurve folding?
@@ -23,3 +30,8 @@ Analysis:
         -What method is best (k-means clustering or something else?) ?
         -Are there other techniques we have not considered?
     -Look through .ipynb's from PHYS650 for a review on how to implement these techniques
+    
+    
+Misc. Notes:
+    -read into HDU formatting/usage (STScI or astropy.io)
+    - cadence =? integration time
