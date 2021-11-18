@@ -1,37 +1,50 @@
-Project Goal: Build a ML model to identify SN in gravitational lenses
+Project Goal: Build a ML model to identify SN in gravitational lenses using TESS lightcurves
+
+Project Title (?): A Comparison of Various Machine Learning Methods to Identify Supernovae in Gravitational Lenses in KiDS
 
 *** --> Question for Dr. Holwerda in next meeting
 
+Need to cite TESScut in our paper: https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract
+
 Analysis:
-    1. Obtain single pixel, 30min cadence TESS lightcurves
-    2. Analyze these lightcurves to search for possible SN
-    3. Use unsupervised ML technique (k-means clustering?) to identify lenses
+    1. Obtain 5x5 pixel, 30min cadence TESS lightcurves
+    2. Generate QA plots for each object (and for each of its observing sectors, if multiple)
+    3. Use unsupervised ML technique (k-means clustering? SOM?) to identify lenses
     4. If time permits, perhaps use CM's code for flare simulation to run a supervised ML technique to identify flares in our data
     
-    
+
 (1.):
     -Example notebook:
         https://github.com/spacetelescope/notebooks/blob/master/notebooks/MAST/TESS/beginner_tour_lc_tp/beginner_tour_lc_tp.ipynb
-    -Obtain data via TESSCut:
+    -Obtain data via TESSCut: --> use cURL commands via os.system(curl_cmd) instead of manually fetching all the data
         https://mast.stsci.edu/tesscut/
-    ***
+    -TESS Sectors:
+        https://tess.mit.edu/observations/
+        
     -Which pixel frame do we want to display in our results? See notebook 2. -- integrate over the whole stack
-    -Do we actually want single-pixel images, or maybe a 3x3 so we can see the surrounding events also? -- 5x5
-    -We are using different data than that of the example notebook above... Do we have the data that we wanted? -- yes, but need        30min cadence
-    -Time bins?? See notebook 1. -- links in TESSCut
-    -Do we care about aperture optimization or do we just want to use the whole pixel? (Example notebook adjusts aperture for LC)      --nope
-    ***
+    -Obtain 5x5 pixel FFIs
+    -From SF: TESS observations in Sectors 1-26 are at 30min cadence; Sectors 27+ are at 10min cadence
+        -We will need to handle this by re-binning 10min data to 30min bins -- Sector number is in the file name and is stored in
+         the HDUList (hdu['PRIMARY'].header['SECTOR'])
+    -When using cURL commands to get the data from MAST: The files are downloaded to the working directory in a new directory with no file extension, but it is a .zip file. Need to append '.zip' to the downloaded file and then open it to decompress the contents. The .fits files for each sector that a single object appears in are then inside the decompressed .zip file.  
+    
+    -Hit a problem when running the code to obtain all the data from MAST. I believe that Archive Utility (which decompresses the .zip files) was just overwhelmed. Maybe try a longer waiting period between each query? 
+    ** OR... Obtain all the data and append '.zip' to each dir, THEN have another loop that iterates through the .zip files for decompression and only deletes them IF decompression was succesful. **
+    
     
 (2.):
-    -Lightcurve folding?
+    -QA plot layout: FFI integrated, normalized image in top left; source info. (skypos, TESS sector, etc. -- maybe also take FFT and show significant peak freqs., if any (?)) in top right; LC across the entire bottom with time [days] across lower x-axis and MJD across upper x-axis (leave y-axis in e/s as it is)
+    
     
 (3.):
     -Literature search for other groups that have done similar work!
-        -What method is best (k-means clustering or something else?) ?
+        -What method is best (k-means clustering, SOM, or something else?) ?
         -Are there other techniques we have not considered?
     -Look through .ipynb's from PHYS650 for a review on how to implement these techniques
     
     
 Misc. Notes:
-    -read into HDU formatting/usage (STScI or astropy.io)
-    - cadence =? integration time
+    -read into HDU formatting/usage (STScI or astropy.io.fits)
+    -when making the final presentation, try making an animation of the image stack that traces out the LC along with it
+    
+    
