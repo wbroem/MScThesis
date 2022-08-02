@@ -8,12 +8,12 @@ Need to cite TESScut in our paper: https://ui.adsabs.harvard.edu/abs/2019ascl.so
 
 Analysis:
     1. Obtain 5x5 pixel, 30min cadence TESS lightcurves
-    2. Generate QA plots for each object (and for each of its observing sectors, if multiple)
-    3. Use unsupervised ML technique (k-means clustering? SOM?) to identify lenses
-    4. If time permits, perhaps use CM's code for flare simulation to run a supervised ML technique to identify flares in our data
+    2. Generate QA plots for each .fits file
+    3. Use unsupervised ML technique (k-means clustering? SOM? classification?) to identify lenses
     
 
 (1.):
+
     -Example notebook:
         https://github.com/spacetelescope/notebooks/blob/master/notebooks/MAST/TESS/beginner_tour_lc_tp/beginner_tour_lc_tp.ipynb
     -Obtain data via TESSCut: --> use cURL commands via os.system(curl_cmd) instead of manually fetching all the data
@@ -26,25 +26,52 @@ Analysis:
     -From SF: TESS observations in Sectors 1-26 are at 30min cadence; Sectors 27+ are at 10min cadence
         -We will need to handle this by re-binning 10min data to 30min bins -- Sector number is in the file name and is stored in
          the HDUList (hdu['PRIMARY'].header['SECTOR'])
-    -When using cURL commands to get the data from MAST: The files are downloaded to the working directory in a new directory with no file extension, but it is a .zip file. Need to append '.zip' to the downloaded file and then open it to decompress the contents. The .fits files for each sector that a single object appears in are then inside the decompressed .zip file.  
+    -When using cURL commands to get the data from MAST: The files are downloaded to the working directory in a new directory with
+     no file extension, but it is a .zip file. Need to append '.zip' to the downloaded file and then open it to decompress the
+     contents. The .fits files for each sector that a single object appears in are then inside the decompressed .zip file.  
     
-    -Hit a problem when running the code to obtain all the data from MAST. I believe that Archive Utility (which decompresses the .zip files) was just overwhelmed. Maybe try a longer waiting period between each query? 
-    ** OR... Obtain all the data and append '.zip' to each dir, THEN have another loop that iterates through the .zip files for decompression and only deletes them IF decompression was succesful. **
+    -Hit a problem when running the code to obtain all the data from MAST. I believe that Archive Utility (which decompresses the 
+    .zip files) was just overwhelmed. Maybe try a longer waiting period between each query? 
+    ** OR... Obtain all the data and append '.zip' to each dir, THEN have another loop that iterates through the .zip files for 
+    decompression and only deletes them IF decompression was succesful. ** --> resolved
     
     
 (2.):
-    -QA plot layout: FFI integrated, normalized image in top left; source info. (skypos, TESS sector, etc. -- maybe also take FFT and show significant peak freqs., if any (?)) in top right; LC across the entire bottom with time [days] across lower x-axis and MJD across upper x-axis (leave y-axis in e/s as it is)
+
+    -QA plot layout: FFI integrated, normalized image in top left; source info. (skypos, TESS sector, etc. -- maybe also take FFT 
+     and show significant peak freqs., if any (?)) in top right; LC across the entire bottom with time [days] across lower x-axis 
+     and MJD across upper x-axis (leave y-axis in e/s as it is)
+    -From SF: the 'weird spikey' LCs are most likely resultant from Moon/Earth shine. SF sent the following documentation for 
+     further explanation: https://archive.stsci.edu/missions/tess/doc/tess_drn/tess_sector_23_drn32_v03.pdf
     
     
 (3.):
+
     -Literature search for other groups that have done similar work!
         -What method is best (k-means clustering, SOM, or something else?) ?
         -Are there other techniques we have not considered?
     -Look through .ipynb's from PHYS650 for a review on how to implement these techniques
-    
+    -We are going to try out K-means clustering initially
+    -Produce a matrix of all the normalized LCs
+        -Some are binned at 10min cadence, need to re-bin to 30min cadence prior to producing the matrix
+        -After producing a histogram of the length of all LCs in our sample, we see a max length of ~27.5 days and a min of 
+          ~24.5 days. We are going to trim down all the LCs to this min. value (taking the same length off either end of those
+          LCs that need to be trimmed)
+        -Use scipy.interpolate() or a similar function to handle lengths of NaN values (ML cannot handle these)
+        -Save the matrix as a pandas data frame .csv once we have confirmed it is in the proper shape to avoid having to re-run
+         that every time (it takes ~15 mins to produce the matrix)
+    -Run the ML algorithm
+    -Try running FFT on all of the LCs just to see if we have any pulsators (should just be a quick loop with scipy.fft ...)
+
     
 Misc. Notes:
+    -KiDS page: https://kids.strw.leidenuniv.nl/overview.php
     -read into HDU formatting/usage (STScI or astropy.io.fits)
     -when making the final presentation, try making an animation of the image stack that traces out the LC along with it
-    
-    
+    -secondary axis: https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html#sphx-glr-gallery-subplots-axes-and-figures-secondary-axis-py
+    -fits handling: https://docs.astropy.org/en/stable/io/fits/index.html and 
+     https://docs.astropy.org/en/stable/io/fits/usage/headers.html
+    -animations: https://github.com/rougier/scientific-visualization-book/blob/master/figures/animation/sine-cosine.mp4
+    -TPFs intro notebook:
+   https://github.com/spacetelescope/notebooks/blob/master/notebooks/MAST/TESS/beginner_how_to_use_tp/beginner_how_to_use_tp.ipynb
+    - sklearn KMeans doc.: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
